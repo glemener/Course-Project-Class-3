@@ -2,11 +2,18 @@
 ## Author - Guillaume Le Mener (glemener)
 ## Merge the training and the test sets to create one data set.
 
-## IMPORTANT - requires stringr package
+## IMPORTANT - requires stringr package for the str_c() function
+if(!require("stringr")) {
+        install.packages("stringr")
+        library(stringr)
+        print("MSG - Package installed. Now at work reading files...")
+}
 
 ## PLEASE SETUP THE 2 DIRECTORIES HERE
-working_dir <- "~/R/Class3/Results/"
-data_dir <- "~/R/Class3/UCI HAR Dataset/"
+working_dir <- getwd()
+
+## where the Samsung data are located
+data_dir <- str_c(working_dir, "/UCI HAR Dataset/")
 
 ## Check if the data directory is set and available
 if (!file.exists(data_dir)) {
@@ -31,6 +38,8 @@ if (!file.exists(working_dir)) {
 }
 
 ## PART 0 - Reading all the files required
+print("MSG - Starting reading the various files. This can take a while...")
+
 
 ## Reading the training set (resutls, subjects and labels)
 if (file.exists(X_train_data_file)) {
@@ -86,6 +95,8 @@ if (file.exists(features_file)) {
         stop(str_c("Missing file: ", features_file))
 }
 
+print("MSG - Merging the data sets. It can take some time...")
+
 
 ## PART 1 - Merging the training and test sets
 ## First, adding the subjects and activity labels to each test and train data sets
@@ -94,6 +105,9 @@ train_data <- cbind(subject_train, y_train_labels, X_train_data)
 
 ## Then, merging both in one data set
 data <- rbind(test_data, train_data)
+
+print("MSG - Part 1 finished.")
+
 
 ## END OF PART 1
 ## -----------------------------------------
@@ -115,17 +129,27 @@ mean_std_columns <- grep("\\-mean\\(\\)*|\\-std\\(\\)*", colnames(data))
 ## c(1:2) is here to keep the first 2 columns
 data <- data[, c(1:2, mean_std_columns)]
 
+print("MSG - Part 2 finished.")
+
+
 ## END OF PART 2
 ## -----------------------------------------
 
 ## PART 3 - Uses descriptive activty names to name the activity in the data
 data[,2] <- activity_labels[data[,2],2]
 
+print("MSG - Part 3 finished.")
+
+
+
 ## END OF PART 3
 ## -----------------------------------------
 
 ## PART 4 - Appropriately labels the data set with descriptive variable names
 ## in fact, it was done in the first part of Part 2 (see colnames() )
+
+print("MSG - Part 4 finished.")
+
 
 ## END OF PART 4
 ## -----------------------------------------
@@ -143,7 +167,5 @@ new_data <- aggregate(x=data[,3:68], by=list(subject=data$subject, activity=data
 ## -----------------------------------------
 
 ## Writing the new data set on file
-write.table(new_data, file=str_c(working_dir,'GLEMENER_test_results.txt'), row.names=FALSE)
-
-
-
+write.table(new_data, file=str_c(working_dir,'/GLEMENER_test_results.txt'), row.names=FALSE)
+print(str_c("MSG - Part 5 finished. The new data set file is available at ",str_c(working_dir,'/GLEMENER_test_results.txt')))
